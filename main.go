@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/zsais/go-gin-prometheus"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -21,6 +23,8 @@ type LittleSnitchRule struct {
 	Direction   string `json:"direction"`
 }
 
+var LITTLE_SNITCH_MAX_SIZE int = 15000
+
 func main() {
 	r := gin.Default()
 
@@ -32,6 +36,15 @@ func main() {
 	})
 
 	r.GET("/hosts.lsrules", func(c *gin.Context) {
+		partAsString := c.DefaultQuery("part", "0")
+
+		part, err := strconv.Atoi(partAsString)
+		if err != nil {
+			c.JSON(500, gin.H{
+				"error": err,
+			})
+			return
+		}
 
 		hostMap, err := GetHostMap("https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts")
 		if err != nil {
@@ -41,7 +54,22 @@ func main() {
 			return
 		}
 
-		rules := CreateLittleSnitch("Steven Black's hosts", "Host list created by Steven Black, https://github.com/StevenBlack/hosts", hostMap["0.0.0.0"])
+		var hosts []string
+		var rules LittleSnitch
+
+		if part != 0 {
+			start := (part - 1) * LITTLE_SNITCH_MAX_SIZE
+			end := part * LITTLE_SNITCH_MAX_SIZE
+
+			hosts = hostMap["0.0.0.0"][start:end]
+			fmt.Println(len(hosts))
+
+			rules = CreateLittleSnitch(fmt.Sprintf("Steven Black's hosts part %d", part), fmt.Sprintf("Host list created by Steven Black, part %d, https://github.com/StevenBlack/hosts", part), hosts)
+		} else {
+			hosts = hostMap["0.0.0.0"]
+
+			rules = CreateLittleSnitch("Steven Black's hosts", "Host list created by Steven Black, https://github.com/StevenBlack/hosts", hosts)
+		}
 
 		c.JSON(200, rules)
 	})

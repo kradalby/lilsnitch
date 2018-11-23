@@ -24,8 +24,13 @@ type LittleSnitchRule struct {
 
 func main() {
 	r := gin.Default()
+
 	p := ginprometheus.NewPrometheus("gin")
 	p.Use(r)
+
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"alive": true})
+	})
 
 	r.GET("/hosts.lsrules", func(c *gin.Context) {
 

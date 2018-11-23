@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-type LittleSnitchEntry struct {
+type LittleSnitch struct {
 	Name        string             `json:"name"`
 	Description string             `json:"description"`
 	Rules       []LittleSnitchRule `json:"rules"`
@@ -42,7 +42,7 @@ func main() {
 			return
 		}
 
-		rules := CreateLittleSnitchEntryList(hostMap["0.0.0.0"])
+		rules := CreateLittleSnitch("Steven Black's hosts", "Host list created by Steven Black, https://github.com/StevenBlack/hosts", hostMap["0.0.0.0"])
 
 		c.JSON(200, rules)
 	})
@@ -50,26 +50,24 @@ func main() {
 	r.Run()
 }
 
-func CreateLittleSnitchEntryList(hosts []string) []LittleSnitchEntry {
-	rules := make([]LittleSnitchEntry, len(hosts))
+func CreateLittleSnitch(name string, description string, hosts []string) LittleSnitch {
+	rules := make([]LittleSnitchRule, len(hosts))
 	for index, host := range hosts {
-		rules[index] = CreateLittleSnitchEntry(host)
+		rules[index] = CreateLittleSnitchRule(host)
 	}
-	return rules
+	return LittleSnitch{
+		Name:        name,
+		Description: description,
+		Rules:       rules,
+	}
 }
 
-func CreateLittleSnitchEntry(host string) LittleSnitchEntry {
-	return LittleSnitchEntry{
-		Name:        host,
-		Description: fmt.Sprintf("Block %s", host),
-		Rules: []LittleSnitchRule{
-			LittleSnitchRule{
-				Action:      "deny",
-				Process:     "any",
-				RemoteHosts: host,
-				Direction:   "outgoing",
-			},
-		},
+func CreateLittleSnitchRule(host string) LittleSnitchRule {
+	return LittleSnitchRule{
+		Action:      "deny",
+		Process:     "any",
+		RemoteHosts: host,
+		Direction:   "outgoing",
 	}
 }
 

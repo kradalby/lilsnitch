@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/zsais/go-gin-prometheus"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -23,6 +24,9 @@ type LittleSnitchRule struct {
 
 func main() {
 	r := gin.Default()
+	p := ginprometheus.NewPrometheus("gin")
+	p.Use(r)
+
 	r.GET("/hosts.lsrules", func(c *gin.Context) {
 
 		hostMap, err := GetHostMap("https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts")
@@ -37,6 +41,7 @@ func main() {
 
 		c.JSON(200, rules)
 	})
+
 	r.Run()
 }
 

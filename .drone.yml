@@ -1,0 +1,28 @@
+pipeline:
+  build:
+    image: plugins/docker
+    repo: kradalby/lilsnitch
+    # auto_tag: true
+    secrets: [ docker_username, docker_password ]
+    tags:
+        - ${DRONE_COMMIT_SHA:0:8}
+        - latest
+
+  deploy:
+    image: quay.io/honestbee/drone-kubernetes
+    deployment: lilsnitch-deployment
+    repo: kradalby/lilsnitch
+    container: lilsnitch-container
+    namespace: lilsnitch
+    secrets: [ kubernetes_server, kubernetes_cert, kubernetes_token ]
+    tag:
+      - ${DRONE_COMMIT_SHA:0:8}
+
+  notify:
+    image: drillster/drone-email
+    host: smtp.fap.no
+    port: 25
+    from: drone@drone.fap.no
+    recipients: [ kradalby@kradalby.no ]
+    when:
+      status: [ success, changed, failure ]

@@ -54,6 +54,7 @@ func main() {
 			return
 		}
 
+		var numberOfHosts int = len(hostMap["0.0.0.0"])
 		var hosts []string
 		var rules LittleSnitch
 
@@ -61,8 +62,11 @@ func main() {
 			start := (part - 1) * LITTLE_SNITCH_MAX_SIZE
 			end := part * LITTLE_SNITCH_MAX_SIZE
 
+			if end > numberOfHosts {
+				end = numberOfHosts
+			}
+
 			hosts = hostMap["0.0.0.0"][start:end]
-			fmt.Println(len(hosts))
 
 			rules = CreateLittleSnitch(fmt.Sprintf("Steven Black's hosts part %d", part), fmt.Sprintf("Host list created by Steven Black, part %d, https://github.com/StevenBlack/hosts", part), hosts)
 		} else {

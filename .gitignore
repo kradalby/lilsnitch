@@ -19,7 +19,6 @@
 *.out
 
 ### Go Patch ###
-/vendor/
 /Godeps/
 
 ### Linux ###

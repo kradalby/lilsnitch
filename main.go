@@ -128,7 +128,7 @@ func ParseHosts(hostsFileContent []byte) (map[string][]string, error) {
 		if len(line) == 0 || line[0] == ';' || line[0] == '#' {
 			continue
 		}
-		pieces := strings.SplitN(line, " ", 2)
+		pieces := strings.Split(line, " ")
 		if len(pieces) > 1 && len(pieces[0]) > 0 {
 			if names := strings.Fields(pieces[1]); len(names) > 0 {
 				if _, ok := hostsMap[pieces[0]]; ok {

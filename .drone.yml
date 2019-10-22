@@ -1,29 +1,56 @@
-pipeline:
-  build:
-    image: plugins/docker
+---
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build
+  pull: if-not-exists
+  image: banzaicloud/drone-kaniko
+  settings:
     repo: kradalby/lilsnitch
-    # auto_tag: true
-    secrets: [ docker_username, docker_password ]
     tags:
-        - ${DRONE_COMMIT_SHA:0:8}
-        - latest
+    - ${DRONE_COMMIT_SHA:0:8}
+    - latest
+    cache: true
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
 
-  deploy:
-    image: quay.io/honestbee/drone-kubernetes
-    deployment: lilsnitch-deployment
-    repo: kradalby/lilsnitch
-    container: lilsnitch-container
+- name: deploy
+  pull: if-not-exists
+  image: quay.io/honestbee/drone-kubernetes
+  settings:
+    container: common
+    deployment: lilsnitch
     namespace: lilsnitch
-    secrets: [ kubernetes_server, kubernetes_cert, kubernetes_token ]
+    repo: kradalby/lilsnitch
     tag:
-      - ${DRONE_COMMIT_SHA:0:8}
+    - ${DRONE_COMMIT_SHA:0:8}
+  environment:
+    KUBERNETES_CERT:
+      from_secret: kubernetes_cert
+    KUBERNETES_SERVER:
+      from_secret: kubernetes_server
+    KUBERNETES_TOKEN:
+      from_secret: kubernetes_token
 
-  notify:
-    image: drillster/drone-email
-    host: smtp.fap.no
-    skip_verify: true
-    port: 25
+- name: notify
+  pull: if-not-exists
+  image: drillster/drone-email
+  settings:
     from: drone@drone.fap.no
-    recipients: [ kradalby@kradalby.no ]
-    when:
-      status: [ success, changed, failure ]
+    host: smtp.fap.no
+    port: 25
+    recipients:
+    - kradalby@kradalby.no
+    skip_verify: true
+  when:
+    status:
+    - success
+    - changed
+    - failure

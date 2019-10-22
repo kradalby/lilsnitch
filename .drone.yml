@@ -20,6 +20,9 @@ steps:
       from_secret: docker_username
     password:
       from_secret: docker_password
+  when:
+    branch:
+    - master
 
 - name: deploy
   pull: if-not-exists
@@ -38,6 +41,9 @@ steps:
       from_secret: kubernetes_server
     KUBERNETES_TOKEN:
       from_secret: kubernetes_token
+  when:
+    branch:
+    - master
 
 - name: notify
   pull: if-not-exists

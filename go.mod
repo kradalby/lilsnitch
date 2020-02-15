@@ -16,8 +16,10 @@ require (
 	github.com/prometheus/procfs v0.0.0-20181005140218-185b4288413d // indirect
 	github.com/sirupsen/logrus v1.2.0 // indirect
 	github.com/ugorji/go/codec v0.0.0-20181120210156-7d13b37dbec6 // indirect
-	github.com/zsais/go-gin-prometheus v0.0.0-20181030200533-58963fb32f54
+	github.com/zsais/go-gin-prometheus v0.1.0
 	golang.org/x/sys v0.0.0-20181122145206-62eef0e2fa9b // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
 	gopkg.in/yaml.v2 v2.2.1 // indirect
 )
+
+go 1.13

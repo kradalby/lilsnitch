@@ -11,6 +11,12 @@ steps:
   pull: if-not-exists
   image: banzaicloud/drone-kaniko
   settings:
+    cache: true
+
+- name: publish
+  pull: if-not-exists
+  image: banzaicloud/drone-kaniko
+  settings:
     repo: kradalby/lilsnitch
     tags:
     - ${DRONE_COMMIT_SHA:0:8}

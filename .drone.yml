@@ -3,6 +3,9 @@ kind: pipeline
 type: kubernetes
 name: default
 
+node_selector:
+  drone: "true"
+
 steps:
   - name: build
     pull: always

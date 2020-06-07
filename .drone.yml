@@ -1,91 +1,142 @@
 ---
-kind: pipeline
-type: kubernetes
-name: default
-
-node_selector:
-  drone: "true"
-
-steps:
-  - name: build
-    pull: always
-    image: plugins/docker
-    environment:
-      DOCKER_BUILDKIT: 1
-    settings:
-      repo: dryrun
-      dry_run: true
-
-  - name: publish
-    pull: always
-    image: plugins/docker
-    environment:
-      DOCKER_BUILDKIT: 1
-    settings:
-      repo: kradalby/lilsnitch
-      tags:
-        - ${DRONE_COMMIT_SHA:0:8}
-        - latest
-      cache: true
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
-    when:
-      branch:
-        - master
-
-  - name: deploy
-    pull: always
-    image: kradalby/drone-kubectl
-    environment:
-      KUBERNETES_CERT:
-        from_secret: kubernetes_cert
-      KUBERNETES_SERVER:
-        from_secret: kubernetes_server
-      KUBERNETES_TOKEN:
-        from_secret: kubernetes_token
-    commands:
-      - kubectl -n lilsnitch set image deployment/lilsnitch common=kradalby/lilsnitch:${DRONE_COMMIT_SHA:0:8} --record
-      - kubectl -n lilsnitch rollout status deployment lilsnitch
-    when:
-      branch:
-        - master
-      event:
-        - push
-
-  - name: discord notification
-    image: appleboy/drone-discord
-    settings:
-      webhook_id:
-        from_secret: discord_webhook_id
-      webhook_token:
-        from_secret: discord_webhook_token
-
+{
+   "kind": "pipeline",
+   "name": "default",
+   "node_selector": {
+      "drone": true
+   },
+   "steps": [
+      {
+         "environment": {
+            "DOCKER_BUILDKIT": 1
+         },
+         "image": "plugins/docker",
+         "name": "Build container image",
+         "pull": "always",
+         "when": {
+            "branch": {
+               "exclude": [
+                  "master"
+               ]
+            }
+         }
+      },
+      {
+         "environment": {
+            "DOCKER_BUILDKIT": 1
+         },
+         "image": "plugins/docker",
+         "name": "Publish image kradalby/lilsnitch",
+         "pull": "always",
+         "settings": {
+            "password": {
+               "from_secret": "docker_password"
+            },
+            "repo": "kradalby/lilsnitch",
+            "tags": [
+               "latest",
+               "${DRONE_COMMIT_SHA:0:8}"
+            ],
+            "username": {
+               "from_secret": "docker_username"
+            }
+         },
+         "when": {
+            "branch": [
+               "master"
+            ],
+            "event": [
+               "push"
+            ]
+         }
+      },
+      {
+         "commands": [
+            "kubectl -n $APP set image deployment/$APP $APP=$REPO:${DRONE_COMMIT_SHA:0:8} --record",
+            "kubectl -n $APP rollout status deployment $APP"
+         ],
+         "environment": {
+            "APP": "lilsnitch",
+            "KUBERNETES_CERT": {
+               "from_secret": "kubernetes_cert"
+            },
+            "KUBERNETES_SERVER": {
+               "from_secret": "kubernetes_server"
+            },
+            "KUBERNETES_token": {
+               "from_secret": "kubernetes_token"
+            },
+            "REPO": "kradalby/lilsnitch"
+         },
+         "image": "kradalby/drone-kubectl",
+         "name": "Deploy lilsnitch to Kubernetes",
+         "pull": "always",
+         "when": {
+            "branch": [
+               "master"
+            ],
+            "event": [
+               "push"
+            ]
+         }
+      },
+      {
+         "image": "appleboy/drone-discord",
+         "name": "Notify Discord",
+         "pull": "always",
+         "settings": {
+            "message": "{{#success build.status}} ✅  Build #{{build.number}} of `{{repo.name}}` succeeded.\n\n📝 Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n🌐 {{ build.link }}\n\n ✅ duration: {{duration build.started build.finished}} \n\n ✅ started: {{datetime build.started \"2006/01/02 15:04\" \"UTC\"}} \n\n ✅ finished: {{datetime build.finished \"2006/01/02 15:04\" \"UTC\"}} {{else}} ❌  Build #{{build.number}} of `{{repo.name}}` failed.\n\n📝 Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n🌐 {{ build.link }}\n\n ✅ duration: {{duration build.started build.finished}} \n\n ✅ started: {{datetime build.started \"2006/01/02 15:04\" \"UTC\"}} \n\n ✅ finished: {{datetime build.finished \"2006/01/02 15:04\" \"UTC\"}}{{/success}}\n",
+            "webhook_id": {
+               "from_secret": "discord_webhook_id"
+            },
+            "webhook_token": {
+               "from_secret": "discord_webhook_token"
+            }
+         },
+         "when": {
+            "status": [
+               "success",
+               "failure"
+            ]
+         }
+      }
+   ],
+   "type": "kubernetes"
+}
 ---
-kind: secret
-name: docker_username
-get:
-  path: docker
-  name: username
-
+{
+   "get": {
+      "name": "id",
+      "path": "discord-build"
+   },
+   "kind": "secret",
+   "name": "discord_webhook_id"
+}
 ---
-kind: secret
-name: docker_password
-get:
-  path: docker
-  name: password
-
+{
+   "get": {
+      "name": "token",
+      "path": "discord-build"
+   },
+   "kind": "secret",
+   "name": "discord_webhook_token"
+}
 ---
-kind: secret
-name: discord_webhook_id
-get:
-  path: discord-build
-  name: id
-
+{
+   "get": {
+      "name": "username",
+      "path": "docker"
+   },
+   "kind": "secret",
+   "name": "docker_username"
+}
 ---
-kind: secret
-name: discord_webhook_token
-get:
-  path: discord-build
-  name: token
+{
+   "get": {
+      "name": "password",
+      "path": "docker"
+   },
+   "kind": "secret",
+   "name": "docker_password"
+}
+...

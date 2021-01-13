@@ -1,1 +1,1 @@
-* Tobias Schmidt <tobidt@gmail.com>
+- Tobias Schmidt <tobidt@gmail.com>

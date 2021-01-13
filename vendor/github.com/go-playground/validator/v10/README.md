@@ -1,5 +1,5 @@
-Package validator
-================
+# Package validator
+
 <img align="right" src="https://raw.githubusercontent.com/go-playground/validator/v9/logo.png">[![Join the chat at https://gitter.im/go-playground/validator](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/go-playground/validator?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ![Project status](https://img.shields.io/badge/version-10.1.0-green.svg)
 [![Build Status](https://travis-ci.org/go-playground/validator.svg?branch=master)](https://travis-ci.org/go-playground/validator)
@@ -12,46 +12,43 @@ Package validator implements value validations for structs and individual fields
 
 It has the following **unique** features:
 
--   Cross Field and Cross Struct validations by using validation tags or custom validators.  
--   Slice, Array and Map diving, which allows any or all levels of a multidimensional field to be validated.
--   Ability to dive into both map keys and values for validation  
--   Handles type interface by determining it's underlying type prior to validation.
--   Handles custom field types such as sql driver Valuer see [Valuer](https://golang.org/src/database/sql/driver/types.go?s=1210:1293#L29)
--   Alias validation tags, which allows for mapping of several validations to a single tag for easier defining of validations on structs
--   Extraction of custom defined Field Name e.g. can specify to extract the JSON name while validating and have it available in the resulting FieldError
--   Customizable i18n aware error messages.
--   Default validator for the [gin](https://github.com/gin-gonic/gin) web framework; upgrading from v8 to v9 in gin see [here](https://github.com/go-playground/validator/tree/master/_examples/gin-upgrading-overriding)
+- Cross Field and Cross Struct validations by using validation tags or custom validators.
+- Slice, Array and Map diving, which allows any or all levels of a multidimensional field to be validated.
+- Ability to dive into both map keys and values for validation
+- Handles type interface by determining it's underlying type prior to validation.
+- Handles custom field types such as sql driver Valuer see [Valuer](https://golang.org/src/database/sql/driver/types.go?s=1210:1293#L29)
+- Alias validation tags, which allows for mapping of several validations to a single tag for easier defining of validations on structs
+- Extraction of custom defined Field Name e.g. can specify to extract the JSON name while validating and have it available in the resulting FieldError
+- Customizable i18n aware error messages.
+- Default validator for the [gin](https://github.com/gin-gonic/gin) web framework; upgrading from v8 to v9 in gin see [here](https://github.com/go-playground/validator/tree/master/_examples/gin-upgrading-overriding)
 
-Installation
-------------
+## Installation
 
 Use go get.
 
-	go get github.com/go-playground/validator/v10
+    go get github.com/go-playground/validator/v10
 
 Then import the validator package into your own code.
 
-	import "github.com/go-playground/validator/v10"
+    import "github.com/go-playground/validator/v10"
 
-Error Return Value
--------
+## Error Return Value
 
 Validation functions return type error
 
 They return type error to avoid the issue discussed in the following, where err is always != nil:
 
-* http://stackoverflow.com/a/29138676/3158232
-* https://github.com/go-playground/validator/issues/134
+- http://stackoverflow.com/a/29138676/3158232
+- https://github.com/go-playground/validator/issues/134
 
 Validator only InvalidValidationError for bad validation input, nil or ValidationErrors as type error; so, in your code all you need to do is check if the error returned is not nil, and if it's not check if error is InvalidValidationError ( if necessary, most of the time it isn't ) type cast it to type ValidationErrors like so:
 
 ```go
 err := validate.Struct(mystruct)
 validationErrors := err.(validator.ValidationErrors)
- ```
+```
 
-Usage and documentation
-------
+## Usage and documentation
 
 Please see https://godoc.org/github.com/go-playground/validator for detailed usage docs.
 
@@ -64,9 +61,10 @@ Please see https://godoc.org/github.com/go-playground/validator for detailed usa
 - [Gin upgrade and/or override validator](https://github.com/go-playground/validator/tree/v9/_examples/gin-upgrading-overriding)
 - [wash - an example application putting it all together](https://github.com/bluesuncorp/wash)
 
-Benchmarks
-------
+## Benchmarks
+
 ###### Run on MacBook Pro (15-inch, 2017) go version go1.10.2 darwin/amd64
+
 ```go
 goos: darwin
 goarch: amd64
@@ -135,19 +133,17 @@ BenchmarkOneof-8                                                10000000        
 BenchmarkOneofParallel-8                                        20000000                70.1 ns/op             0 B/op          0 allocs/op
 ```
 
-Complementary Software
-----------------------
+## Complementary Software
 
 Here is a list of software that complements using this library either pre or post validation.
 
-* [form](https://github.com/go-playground/form) - Decodes url.Values into Go value(s) and Encodes Go value(s) into url.Values. Dual Array and Full map support.
-* [mold](https://github.com/go-playground/mold) - A general library to help modify or set data within data structures and other objects
+- [form](https://github.com/go-playground/form) - Decodes url.Values into Go value(s) and Encodes Go value(s) into url.Values. Dual Array and Full map support.
+- [mold](https://github.com/go-playground/mold) - A general library to help modify or set data within data structures and other objects
 
-How to Contribute
-------
+## How to Contribute
 
 Make a pull request...
 
-License
-------
+## License
+
 Distributed under MIT License, please see license file within the code for more details.

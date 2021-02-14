@@ -36,25 +36,6 @@
         "when": { "branch": ["master"], "event": ["push"] },
       },
       {
-        "commands":
-          [
-            "kubectl -n $APP set image deployment/$APP $APP=$REPO:${DRONE_COMMIT_SHA:0:8} --record",
-            "kubectl -n $APP rollout status deployment $APP",
-          ],
-        "environment":
-          {
-            "APP": "lilsnitch",
-            "KUBERNETES_CERT": { "from_secret": "kubernetes_cert" },
-            "KUBERNETES_SERVER": { "from_secret": "kubernetes_server" },
-            "KUBERNETES_TOKEN": { "from_secret": "kubernetes_token" },
-            "REPO": "kradalby/lilsnitch",
-          },
-        "image": "kradalby/drone-kubectl",
-        "name": "Deploy lilsnitch to Kubernetes",
-        "pull": "always",
-        "when": { "branch": ["master"], "event": ["push"] },
-      },
-      {
         "image": "appleboy/drone-discord",
         "name": "Notify Discord",
         "pull": "always",

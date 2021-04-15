@@ -34,7 +34,6 @@ func httpHandler(w http.ResponseWriter, req *http.Request) {
 	})
 }
 ```
-
 ```
 event: message
 data: some data\\nmore data
@@ -42,7 +41,7 @@ data: some data\\nmore data
 id: 124
 event: message
 data: {"content":"hi!","date":1431540810,"user":"manu"}
-
+ 
 ```
 
 ## Content-Type
@@ -50,7 +49,6 @@ data: {"content":"hi!","date":1431540810,"user":"manu"}
 ```go
 fmt.Println(sse.ContentType)
 ```
-
 ```
 text/event-stream
 ```

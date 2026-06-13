@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/zsais/go-gin-prometheus"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	ginprometheus "github.com/zsais/go-gin-prometheus"
 )
 
 type LittleSnitch struct {
@@ -54,7 +55,7 @@ func main() {
 			return
 		}
 
-		var numberOfHosts int = len(hostMap["0.0.0.0"])
+		var numberOfHosts = len(hostMap["0.0.0.0"])
 		var hosts []string
 		var rules LittleSnitch
 
@@ -78,7 +79,7 @@ func main() {
 		c.JSON(200, rules)
 	})
 
-	r.Run()
+	_ = r.Run()
 }
 
 func CreateLittleSnitch(name string, description string, hosts []string) LittleSnitch {
@@ -108,8 +109,9 @@ func GetHostMap(hostsURL string) (map[string][]string, error) {
 		return nil, err
 	}
 
-	defer response.Body.Close()
-	content, err := ioutil.ReadAll(response.Body)
+	defer func() { _ = response.Body.Close() }()
+
+	content, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +130,7 @@ func GetHostMap(hostsURL string) (map[string][]string, error) {
 func ParseHosts(hostsFileContent []byte) (map[string][]string, error) {
 	hostsMap := map[string][]string{}
 	for _, line := range strings.Split(strings.Trim(string(hostsFileContent), " \t\r\n"), "\n") {
-		line = strings.Replace(strings.Trim(line, " \t"), "\t", " ", -1)
+		line = strings.ReplaceAll(strings.Trim(line, " \t"), "\t", " ")
 		if len(line) == 0 || line[0] == ';' || line[0] == '#' {
 			continue
 		}

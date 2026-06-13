@@ -55,7 +55,7 @@ func main() {
 			return
 		}
 
-		var numberOfHosts = len(hostMap["0.0.0.0"])
+		numberOfHosts := len(hostMap["0.0.0.0"])
 		var hosts []string
 		var rules LittleSnitch
 

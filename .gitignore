@@ -1,4 +1,7 @@
 *.lsrules
+
+# Nix build output
+/result
 # Created by https://www.gitignore.io/api/docker,macos,linux,vim,go
 # Edit at https://www.gitignore.io/?templates=docker,macos,linux,vim,go
 
